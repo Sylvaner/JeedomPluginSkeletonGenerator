@@ -1,9 +1,28 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Jeedom plugin skeleton generator
+Copyright (C) 2018 Sylvain DANGIN
 
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 import json
 import os
 import sys
 import shutil
+import base64
+from unicodedata import normalize
 
 DEFAULT_PACKAGE_NAME = "The best plugin in the world"
 DOCUMENTATION_LINK = "https://www.perdu.com"
@@ -80,7 +99,7 @@ def ask_y_n(question, default='y'):
     choices = 'Y/n'
     if default != 'y':
         choices = 'y/N'
-    choice = raw_input('%s [%s] : ' % (question, choices)).lower()
+    choice = input('%s [%s] : ' % (question, choices)).lower()
     if choice == default or choice == '':
         return default
     return choice
@@ -96,7 +115,7 @@ def ask_with_default(message, default):
     :return:        User answer
     :rtype:         str
     """
-    answer = raw_input('%s [%s] : ' % (message, default))
+    answer = input('%s [%s] : ' % (message, default))
     if answer == '':
         answer = default
     return answer
@@ -119,7 +138,7 @@ def ask_with_multiple_choices(message, choices):
 
     loop = True
     while loop:
-        choice = raw_input("Choice : ")
+        choice = input("Choice : ")
         result = 0
         try:
             result = int(choice)
@@ -172,7 +191,7 @@ def create_folder_struct(plugin_id):
     license_file = open(plugin_id+os.sep+'LICENSE', 'w')
     license_file.close()
     # Documentation folder
-    os.mkdir(plugin_id+os.sep+'docs'+data['documentation_language'])
+    os.mkdir(plugin_id+os.sep+'docs'+os.sep+data['documentation_language'])
 
 
 def get_data():
@@ -185,12 +204,15 @@ def get_data():
     print(' - The name is a string that will be display in Jeedom interface')
     data['name'] = ask_with_default('Name : ', DEFAULT_PACKAGE_NAME)
     plugin_id = data['name'].lower().replace(' ', '_')
+    plugin_id = normalize('NFKD', plugin_id).encode('ASCII', 'ignore')
+    plugin_id = plugin_id.decode('UTF-8')
 
     print(' - The ID is a uniq string that identified your plugin.')
     plugin_id = data['id'] = ask_with_default('ID : ', plugin_id)
-    data['description'] = raw_input('Description (optional) : ')
+
+    data['description'] = input('Description (optional) : ')
     data['license'] = ask_with_default('License', 'GPL')
-    data['author'] = raw_input('Author (optionnal) : ')
+    data['author'] = input('Author (optionnal) : ')
     data['require'] = ask_with_default('Jeedom required version', '3.0')
     data['version'] = ask_with_default('Plugin version', '1.0')
     data['category'] = ask_with_multiple_choices(
@@ -209,13 +231,14 @@ def get_data():
             'No': 'stop'
             }
         while loop:
-            result = ask_with_multiple_choices('Add field ?', item_type.keys())
+            result = ask_with_multiple_choices('Add field ?',
+                                               list(item_type.keys()))
             field_type = item_type[result]
             if field_type == 'stop':
                 loop = False
             else:
-                label = raw_input('Label : ')
-                code = raw_input('Code : ')
+                label = input('Label : ')
+                code = input('Code : ')
                 configuration[field_type] = {'label': label, 'code': code}
     data['configuration'] = configuration
 
@@ -273,7 +296,7 @@ def gen_icon(data):
     :type data: dict
     """
     with open(data['plugin_info_path']+data['id']+'_icon.png', 'wb') as dest:
-        dest.write(ICON.decode('base64'))
+        dest.write(base64.b64decode(ICON))
         dest.close()
 
 
@@ -316,8 +339,8 @@ def gen_configuration(data):
                 if (field_type == 'checkbox'):
                     dest.write('type="checkbox" ')
                 dest.write('data-l1key="%s" />\n'
-                           '      </div>'
-                           '    </div>'
+                           '      </div>\n'
+                           '    </div>\n'
                            '' % (field_data['code']))
         dest.write('  </fieldset>\n</form>\n')
         dest.close()
