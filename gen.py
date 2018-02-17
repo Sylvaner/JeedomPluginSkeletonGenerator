@@ -168,9 +168,11 @@ def create_folder_struct(plugin_id):
     # Core subfolders
     for core_subfolder in core_subfolders:
         os.mkdir(plugin_id+os.sep+'core'+os.sep+core_subfolder)
-    # Licence file
-    licence_file = open(plugin_id+os.sep+'LICENCE', 'w')
-    licence_file.close()
+    # license file
+    license_file = open(plugin_id+os.sep+'LICENSE', 'w')
+    license_file.close()
+    # Documentation folder
+    os.mkdir(plugin_id+os.sep+'docs'+data['documentation_language'])
 
 
 def get_data():
@@ -187,9 +189,9 @@ def get_data():
     print(' - The ID is a uniq string that identified your plugin.')
     plugin_id = data['id'] = ask_with_default('ID : ', plugin_id)
     data['description'] = raw_input('Description (optional) : ')
-    data['licence'] = ask_with_default('Licence', 'AGPL')
+    data['license'] = ask_with_default('License', 'GPL')
     data['author'] = raw_input('Author (optionnal) : ')
-    data['require'] = ask_with_default('Jeedom miniman version', '3.0')
+    data['require'] = ask_with_default('Jeedom required version', '3.0')
     data['version'] = ask_with_default('Plugin version', '1.0')
     data['category'] = ask_with_multiple_choices(
             'Plugin category', JEEDOM_PLUGIN_CATEGORIES)
@@ -248,7 +250,7 @@ def gen_info_json(data):
                    '  "changelog": "%s"' % (
                        data['id'],
                        data['name'],
-                       data['licence'],
+                       data['license'],
                        data['require'],
                        data['version'],
                        data['category'],
