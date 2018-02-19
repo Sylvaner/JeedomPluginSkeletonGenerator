@@ -157,11 +157,11 @@ def create_folder_struct(plugin_id):
     :type plugin_id: str
     """
     subfolders = [
+        '3rdparty',
         'core',
         'desktop',
         'docs',
-        'plugin_info',
-        'ressources'
+        'plugin_info'
     ]
     core_subfolders = [
         'ajax',
