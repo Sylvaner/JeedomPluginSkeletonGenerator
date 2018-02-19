@@ -157,7 +157,6 @@ def create_folder_struct(plugin_id):
     :type plugin_id: str
     """
     subfolders = [
-        '3rdparty',
         'core',
         'desktop',
         'docs',
@@ -322,10 +321,13 @@ def gen_configuration(data):
     :param data: All data
     :type data: dict
     """
-    with open(data['plugin_info_path']+'configuration.php', 'w') as dest:
-        dest.write(PHP_HEADER+PHP_INCLUDE_CORE_3+PHP_CHECK_USER_CONNECT+"?>\n")
-        dest.write('<form class="form-horizontal">\n  <fieldset>\n')
-        if data['configuration'] is not None:
+    if data['configuration']:
+        with open(data['plugin_info_path']+'configuration.php', 'w') as dest:
+            dest.write(PHP_HEADER)
+            dest.write(PHP_INCLUDE_CORE_3)
+            dest.write(PHP_CHECK_USER_CONNECT)
+            dest.write("?>\n")
+            dest.write('<form class="form-horizontal">\n  <fieldset>\n')
             for field_type, field_data in data['configuration'].items():
                 dest.write('    <div class="form-group">\n'
                            '      <label class="col-sm-3 control-label">\n'
@@ -340,8 +342,8 @@ def gen_configuration(data):
                            '      </div>\n'
                            '    </div>\n'
                            '' % (field_data['code']))
-        dest.write('  </fieldset>\n</form>\n')
-        dest.close()
+            dest.write('  </fieldset>\n</form>\n')
+            dest.close()
 
 
 def gen_desktop_php(data):
@@ -380,6 +382,8 @@ def gen_core_php(data):
                    '  /*************** Attributs ***************/\n\n'
                    '  /************* Static methods ************/\n\n'
                    '  /**************** Methods ****************/\n\n'
+                   '  public function execute($_options = array()) {\n\n'
+                   '  }\n\n'
                    '  /********** Getters and setters **********/\n\n'
                    '}\n' % (data['id'], data['id']))
         dest.close()
