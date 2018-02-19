@@ -222,7 +222,7 @@ def get_data():
 
     configuration = None
 
-    if ask_y_n('Generate plugin configuration page ?'):
+    if ask_y_n('Generate plugin configuration page ?', 'y') == 'y':
         configuration = {}
         loop = True
         item_type = {
@@ -327,7 +327,7 @@ def gen_configuration(data):
     with open(data['plugin_info_path']+'configuration.php', 'w') as dest:
         dest.write(PHP_HEADER+PHP_INCLUDE_CORE_3+PHP_CHECK_USER_CONNECT+"?>\n")
         dest.write('<form class="form-horizontal">\n  <fieldset>\n')
-        if data is not False:
+        if data['configuration'] is not None:
             for field_type, field_data in data['configuration'].items():
                 dest.write('    <div class="form-group">\n'
                            '      <label class="col-sm-3 control-label">\n'
